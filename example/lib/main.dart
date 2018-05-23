@@ -13,24 +13,31 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  StreamSubscription<dynamic> _subscription;
-  int _id = 0;
+  StreamSubscription<dynamic> _subscriptionA;
+  StreamSubscription<dynamic> _subscriptionB;
 
-  void _onPressed() {
+  void _start(bool a) {
     // ignore: cancel_subscriptions
-    StreamSubscription<dynamic> subscription;
+    StreamSubscription<dynamic> subscription =
+        a ? _subscriptionA : _subscriptionB;
 
-    if (_subscription != null) {
-      _subscription.cancel();
+    if (subscription != null) {
+      subscription.cancel();
+      subscription = null;
     } else {
-      final id = ++_id;
+      final streamId = 'Stream ${a ? 'A' : 'B'}';
       subscription = testChannel
-          .receiveBroadcastStream('stream $id')
-          .listen((data) => debugPrint('Received from $id: $data'));
+          .receiveBroadcastStream(streamId)
+          .listen(
+              (data) => debugPrint('Received from $streamId: $data'));
     }
 
     setState(() {
-      _subscription = subscription;
+      if (a) {
+        _subscriptionA = subscription;
+      } else {
+        _subscriptionB = subscription;
+      }
     });
   }
 
@@ -42,9 +49,18 @@ class _MyAppState extends State<MyApp> {
           title: new Text('Demo'),
         ),
         body: new Center(
-          child: new FlatButton(
-            onPressed: _onPressed,
-            child: Text(_subscription != null ? 'Stop' : 'Start'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              new FlatButton(
+                onPressed: () => _start(true),
+                child: Text(_subscriptionA != null ? 'Stop A' : 'Start A'),
+              ),
+              new FlatButton(
+                onPressed: () => _start(false),
+                child: Text(_subscriptionB != null ? 'Stop B' : 'Start B'),
+              ),
+            ],
           ),
         ),
       ),
