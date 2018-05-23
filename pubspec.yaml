@@ -1,0 +1,14 @@
+name: streams_channel
+description: Extended EventChannel that allow multiple streams with different parameters
+version: 0.0.1
+author: Loup Inc. <hello@intheloup.io>
+homepage: https://github.com/loup-v/streams_channel
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    androidPackage: io.intheloup.streamschannel
+    pluginClass: StreamsChannelPlugin
