@@ -109,7 +109,7 @@ public final class StreamsChannel {
         }
 
         private void logError(int id, String message, Throwable e) {
-            Log.e(TAG + name, String.format("%s$1 [id=%d$2]", message, id), e);
+            Log.e(TAG + name, String.format("%s [id=%d]", message, id), e);
         }
 
         private final class EventSinkImplementation implements EventChannel.EventSink {
@@ -121,7 +121,7 @@ public final class StreamsChannel {
             @SuppressLint("DefaultLocale")
             private EventSinkImplementation(int id) {
                 this.id = id;
-                this.name = String.format("%s$1<%d$2>", StreamsChannel.this.name, id);
+                this.name = String.format("%s<%d>", StreamsChannel.this.name, id);
             }
 
             @Override
