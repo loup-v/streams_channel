@@ -137,8 +137,6 @@ public class DemoPlugin {
 @end
 ```
 
-For the Objective-C code and more, see the example project.
-
 
 ## Author
 
