@@ -12,7 +12,7 @@ import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.PluginRegistry;
 import io.intheloup.streamschannel.StreamsChannel;
 
-public class DemoStreamsChannelPlugin {
+public class DemoPlugin {
 
     public static void registerWith(PluginRegistry.Registrar registrar) {
         final StreamsChannel channel = new StreamsChannel(registrar.messenger(), "streams_channel_test");

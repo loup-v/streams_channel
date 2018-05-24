@@ -32,6 +32,16 @@ class _MyAppState extends State<MyApp> {
       subscription = testChannel
           .receiveBroadcastStream(streamId)
           .listen((data) => debugPrint('Received from $streamId: $data'));
+
+      subscription.onDone(() {
+        setState(() {
+          if (a) {
+            _subscriptionA = null;
+          } else {
+            _subscriptionB = null;
+          }
+        });
+      });
     }
 
     setState(() {

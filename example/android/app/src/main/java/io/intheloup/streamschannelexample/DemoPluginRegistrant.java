@@ -10,7 +10,7 @@ public final class DemoPluginRegistrant {
     if (alreadyRegisteredWith(registry)) {
       return;
     }
-    DemoStreamsChannelPlugin.registerWith(registry.registrarFor("io.intheloup.streamschannelexample.DemoStreamsChannelPlugin"));
+    DemoPlugin.registerWith(registry.registrarFor("io.intheloup.streamschannelexample.DemoPlugin"));
   }
 
   private static boolean alreadyRegisteredWith(PluginRegistry registry) {
