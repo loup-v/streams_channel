@@ -15,7 +15,7 @@ Add streams_channel to your pubspec.yaml:
 
 ```yaml
 dependencies:
-  streams_channel: ^0.1.0
+  streams_channel: ^0.2.0
 ```
 
 ## Example
@@ -44,57 +44,97 @@ On each stream, first subscription will trigger `onListen` on platform side, and
 
 ### Platform side
 
+#### Android
+
 ```java
 public class DemoPlugin {
-
   public static void registerWith(PluginRegistry.Registrar registrar) {
-      final StreamsChannel channel = new StreamsChannel(registrar.messenger(), "some_channel");
-      channel.setStreamHandler(new StreamHandler());
+    final StreamsChannel channel = new StreamsChannel(registrar.messenger(), "streams_channel_test");
+    channel.setStreamHandlerFactory(new StreamsChannel.StreamHandlerFactory() {
+      @Override
+      public EventChannel.StreamHandler create(Object arguments) {
+        return new StreamHandler();
+      }
+    });
   }
 
+  // Send "Hello" 10 times, every second, then ends the stream
   public static class StreamHandler implements EventChannel.StreamHandler {
 
     private final Handler handler = new Handler();
-    private final Map<String, Runner> runners = new HashMap<>();
+    private final Runnable runnable = new Runnable() {
+      @Override
+      public void run() {
+        if (count > 10) {
+            eventSink.endOfStream();
+        } else {
+            eventSink.success("Hello " + count + "/10");
+        }
+        count++;
+        handler.postDelayed(this, 1000);
+      }
+    };
+
+    private EventChannel.EventSink eventSink;
+    private int count = 1;
 
     @Override
     public void onListen(Object o, final EventChannel.EventSink eventSink) {
-        final Runner runner = new Runner(handler, eventSink);
-        runners.put(o.toString(), runner);
-        runner.run();
+      this.eventSink = eventSink;
+      runnable.run();
     }
 
     @Override
     public void onCancel(Object o) {
-        handler.removeCallbacks(runners.get(o.toString()));
-        runners.remove(o.toString());
-    }
-
-    // Send "Hello" 10 times, every second, then ends the stream
-    public static class Runner implements Runnable {
-
-      private final Handler handler;
-      private final EventChannel.EventSink sink;
-      private int count = 1;
-
-      Runner(Handler handler, EventChannel.EventSink sink) {
-          this.handler = handler;
-          this.sink = sink;
-      }
-
-      @Override
-      public void run() {
-          if (count > 10) {
-              sink.endOfStream();
-          } else {
-              sink.success("Hello " + count + "/10");
-          }
-          count++;
-          handler.postDelayed(this, 1000);
-      }
+      handler.removeCallbacks(runnable);
     }
   }
 }
+```
+
+#### iOS
+
+```objective-c
+@interface StreamHandler : NSObject<FlutterStreamHandler>
+  @property(strong, nonatomic) NSTimer *timer;
+  @property(assign, nonatomic) NSInteger count;
+@end
+
+@implementation DemoPlugin
+
++ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
+
+  FlutterStreamsChannel *channel = [FlutterStreamsChannel streamsChannelWithName:@"streams_channel_test" binaryMessenger:registrar.messenger];
+  [channel setStreamHandlerFactory:^NSObject<FlutterStreamHandler> *(id arguments) {
+    return [StreamHandler new];
+  }];
+}
+
+@end
+
+// Send "Hello" 10 times, every second, then ends the stream
+@implementation StreamHandler
+
+- (FlutterError *)onListenWithArguments:(id)arguments eventSink:(FlutterEventSink)events {
+  self.count = 1;
+  self.timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+    if(self.count > 10) {
+      events(FlutterEndOfEventStream);
+    } else {
+      events([NSString stringWithFormat:@"Hello %ld/10", (long)self.count]);
+      self.count++;
+    }
+  }];
+
+  return nil;
+}
+
+- (FlutterError *)onCancelWithArguments:(id)arguments {
+  [self.timer invalidate];
+  self.timer = nil;
+  return nil;
+}
+@end
 ```
 
 For the Objective-C code and more, see the example project.

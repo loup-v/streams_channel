@@ -21,10 +21,11 @@ public class DemoPlugin {
         });
     }
 
+    // Send "Hello" 10 times, every second, then ends the stream
     public static class StreamHandler implements EventChannel.StreamHandler {
 
-        private Handler handler = new Handler();
-        private Runnable runnable = new Runnable() {
+        private final Handler handler = new Handler();
+        private final Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 if (count > 10) {
@@ -51,9 +52,6 @@ public class DemoPlugin {
         public void onCancel(Object o) {
             System.out.println("StreamHandler - onCancel: " + o);
             handler.removeCallbacks(runnable);
-            eventSink = null;
-            runnable = null;
-            handler = null;
         }
     }
 }

@@ -1,3 +1,7 @@
+## 0.2.0
+
+* New: Refactor API into using a factory to create stream handler on demand, one for each active stream
+
 ## 0.1.0
 
 * New: StreamsChannel (iOS side)

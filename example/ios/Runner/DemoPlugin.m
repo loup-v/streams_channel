@@ -21,6 +21,7 @@
 
 @end
 
+// Send "Hello" 10 times, every second, then ends the stream
 @implementation StreamHandler
 
 - (FlutterError *)onListenWithArguments:(id)arguments eventSink:(FlutterEventSink)events {
