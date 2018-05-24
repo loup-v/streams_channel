@@ -38,7 +38,7 @@
   
   NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
     NSInteger count = [[self.counts objectForKey:arguments] integerValue];
-    if(count == 10) {
+    if(count > 10) {
       events(FlutterEndOfEventStream);
     } else {
       events([NSString stringWithFormat:@"Hello %ld/10", (long)count]);

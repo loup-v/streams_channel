@@ -43,6 +43,7 @@ public class DemoPlugin {
 
             private final Handler handler;
             private final EventChannel.EventSink sink;
+            private int count = 1;
 
             Runner(Handler handler, EventChannel.EventSink sink) {
                 this.handler = handler;
@@ -51,7 +52,12 @@ public class DemoPlugin {
 
             @Override
             public void run() {
-                sink.success("Hello");
+                if (count > 10) {
+                    sink.endOfStream();
+                } else {
+                    sink.success("Hello " + count + "/10");
+                }
+                count++;
                 handler.postDelayed(this, 1000);
             }
 
