@@ -3,19 +3,22 @@
 
 #import <Flutter/Flutter.h>
 
+//typedef FlutterMessageHandler (^FlutterStreamsHandlerFactory)();
+
 @interface FlutterStreamsChannel : NSObject
 
-+ (instancetype)streamsChannelWithName:(NSString*)name
++ (nonnull instancetype)streamsChannelWithName:(NSString*)name
                      binaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger;
 
-+ (instancetype)streamsChannelWithName:(NSString*)name
++ (nonnull instancetype)streamsChannelWithName:(NSString*)name
                      binaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger
                                codec:(NSObject<FlutterMethodCodec>*)codec;
 
-- (instancetype)initWithName:(NSString*)name
+- (nonnull instancetype)initWithName:(NSString*)name
              binaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger
                        codec:(NSObject<FlutterMethodCodec>*)codec;
 
-- (void)setStreamHandler:(NSObject<FlutterStreamHandler>* _Nullable)handler;
+- (void)setStreamHandlerFactory:(NSObject<FlutterStreamHandler>* (^)(id))factory;
+
 @end
 

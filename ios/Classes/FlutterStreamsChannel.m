@@ -3,6 +3,15 @@
 
 #import "FlutterStreamsChannel.h"
 
+@interface FlutterStreamsChannelStream : NSObject
+  @property(strong, nonatomic) FlutterEventSink sink;
+  @property(strong, nonatomic) NSObject<FlutterStreamHandler> *handler;
+@end
+
+@implementation FlutterStreamsChannelStream
+
+@end
+
 @implementation FlutterStreamsChannel {
   NSObject<FlutterBinaryMessenger>* _messenger;
   NSString* _name;
@@ -31,44 +40,45 @@
   return self;
 }
 
-- (void)setStreamHandler:(NSObject<FlutterStreamHandler>*)handler {
-  if (!handler) {
+- (void)setStreamHandlerFactory:(NSObject<FlutterStreamHandler> *(^)(id))factory {
+  if (!factory) {
     [_messenger setMessageHandlerOnChannel:_name binaryMessageHandler:nil];
     return;
   }
   
-  __block NSMutableDictionary *sinks = [NSMutableDictionary new];
-  
+  __block NSMutableDictionary *streams = [NSMutableDictionary new];
   FlutterBinaryMessageHandler messageHandler = ^(NSData* message, FlutterBinaryReply callback) {
     FlutterMethodCall* call = [self->_codec decodeMethodCall:message];
     NSNumber *key = [self extractKeyFor:@"listen" from:call];
     
-    if (key != nil) {
-      FlutterEventSink sink = [sinks objectForKey:key];
-      if(sink != nil) {
-        FlutterError* error = [handler onCancelWithArguments:nil];
+    if (key) {
+      FlutterStreamsChannelStream *stream = [streams objectForKey:key];
+      if(stream) {
+        FlutterError* error = [stream.handler onCancelWithArguments:nil];
         if (error) {
           NSLog(@"Failed to cancel existing stream: %@. %@ (%@)", error.code, error.message,
                 error.details);
         }
       }
       
-      sink = ^(id event) {
+      stream = [FlutterStreamsChannelStream new];
+      stream.sink = ^(id event) {
         NSString *name = [NSString stringWithFormat:@"%@<%@>", self->_name, key];
         
         if (event == FlutterEndOfEventStream) {
           [self->_messenger sendOnChannel:name message:nil];
         } else if ([event isKindOfClass:[FlutterError class]]) {
           [self->_messenger sendOnChannel:name
-                            message:[self->_codec encodeErrorEnvelope:(FlutterError*)event]];
+                                  message:[self->_codec encodeErrorEnvelope:(FlutterError*)event]];
         } else {
           [self->_messenger sendOnChannel:name message:[self->_codec encodeSuccessEnvelope:event]];
         }
       };
+      stream.handler = factory(call.arguments);
       
-      [sinks setObject:sink forKey:key];
+      [streams setObject:stream forKey:key];
       
-      FlutterError* error = [handler onListenWithArguments:call.arguments eventSink:sink];
+      FlutterError* error = [stream.handler onListenWithArguments:call.arguments eventSink:stream.sink];
       if (error) {
         callback([self->_codec encodeErrorEnvelope:error]);
       } else {
@@ -78,9 +88,9 @@
     }
     
     key = [self extractKeyFor:@"cancel" from:call];
-    if (key != nil) {
-      FlutterEventSink sink = [sinks objectForKey:key];
-      if(sink == nil) {
+    if (key) {
+      FlutterStreamsChannelStream *stream = [streams objectForKey:key];
+      if(!stream) {
         callback(
                  [self->_codec encodeErrorEnvelope:[FlutterError errorWithCode:@"error"
                                                                        message:@"No active stream to cancel"
@@ -88,9 +98,9 @@
         return;
       }
       
-      [sinks removeObjectForKey:key];
+      [streams removeObjectForKey:key];
       
-      FlutterError* error = [handler onCancelWithArguments:call.arguments];
+      FlutterError* error = [stream.handler onCancelWithArguments:call.arguments];
       if (error) {
         callback([self->_codec encodeErrorEnvelope:error]);
       } else {

@@ -5,9 +5,6 @@ package io.intheloup.streamschannelexample;
 
 import android.os.Handler;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.PluginRegistry;
 import io.intheloup.streamschannel.StreamsChannel;
@@ -16,51 +13,47 @@ public class DemoPlugin {
 
     public static void registerWith(PluginRegistry.Registrar registrar) {
         final StreamsChannel channel = new StreamsChannel(registrar.messenger(), "streams_channel_test");
-        channel.setStreamHandler(new StreamHandler());
+        channel.setStreamHandlerFactory(new StreamsChannel.StreamHandlerFactory() {
+            @Override
+            public EventChannel.StreamHandler create(Object arguments) {
+                return new StreamHandler();
+            }
+        });
     }
 
     public static class StreamHandler implements EventChannel.StreamHandler {
 
-        private final Handler handler = new Handler();
-        private final Map<String, Runner> runners = new HashMap<>();
+        private Handler handler = new Handler();
+        private Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (count > 10) {
+                    eventSink.endOfStream();
+                } else {
+                    eventSink.success("Hello " + count + "/10");
+                }
+                count++;
+                handler.postDelayed(this, 1000);
+            }
+        };
+
+        private EventChannel.EventSink eventSink;
+        private int count = 1;
 
         @Override
         public void onListen(Object o, final EventChannel.EventSink eventSink) {
             System.out.println("StreamHandler - onListen: " + o);
-            final Runner runner = new Runner(handler, eventSink);
-            runners.put(o.toString(), runner);
-            runner.run();
+            this.eventSink = eventSink;
+            runnable.run();
         }
 
         @Override
         public void onCancel(Object o) {
             System.out.println("StreamHandler - onCancel: " + o);
-            handler.removeCallbacks(runners.get(o.toString()));
-            runners.remove(o.toString());
-        }
-
-        public static class Runner implements Runnable {
-
-            private final Handler handler;
-            private final EventChannel.EventSink sink;
-            private int count = 1;
-
-            Runner(Handler handler, EventChannel.EventSink sink) {
-                this.handler = handler;
-                this.sink = sink;
-            }
-
-            @Override
-            public void run() {
-                if (count > 10) {
-                    sink.endOfStream();
-                } else {
-                    sink.success("Hello " + count + "/10");
-                }
-                count++;
-                handler.postDelayed(this, 1000);
-            }
-
+            handler.removeCallbacks(runnable);
+            eventSink = null;
+            runnable = null;
+            handler = null;
         }
     }
 }

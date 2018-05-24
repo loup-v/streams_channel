@@ -21,6 +21,11 @@ import io.flutter.plugin.common.MethodCodec;
 import io.flutter.plugin.common.StandardMethodCodec;
 
 public final class StreamsChannel {
+
+    public interface StreamHandlerFactory {
+        EventChannel.StreamHandler create(Object arguments);
+    }
+
     private static final String TAG = "StreamsChannel#";
 
     private static final Pattern LISTEN_PATTERN = Pattern.compile("listen<(\\d*)>");
@@ -43,16 +48,16 @@ public final class StreamsChannel {
         this.codec = codec;
     }
 
-    public void setStreamHandler(final EventChannel.StreamHandler handler) {
-        messenger.setMessageHandler(name, handler == null ? null : new IncomingStreamRequestHandler(handler));
+    public void setStreamHandlerFactory(final StreamHandlerFactory factory) {
+        messenger.setMessageHandler(name, factory == null ? null : new IncomingStreamRequestHandler(factory));
     }
 
     private final class IncomingStreamRequestHandler implements BinaryMessageHandler {
-        private final EventChannel.StreamHandler handler;
-        private final ConcurrentHashMap<Integer, EventChannel.EventSink> activeSinks = new ConcurrentHashMap<>();
+        private final StreamHandlerFactory factory;
+        private final ConcurrentHashMap<Integer, Stream> streams = new ConcurrentHashMap<>();
 
-        IncomingStreamRequestHandler(EventChannel.StreamHandler handler) {
-            this.handler = handler;
+        IncomingStreamRequestHandler(StreamHandlerFactory factory) {
+            this.factory = factory;
         }
 
         @Override
@@ -75,32 +80,35 @@ public final class StreamsChannel {
         }
 
         private void onListen(int id, Object arguments, BinaryReply callback) {
-            final EventChannel.EventSink eventSink = new EventSinkImplementation(id);
-            final EventChannel.EventSink oldSink = activeSinks.putIfAbsent(id, eventSink);
-            if (oldSink != null) {
+            final Stream stream = new Stream(new EventSinkImplementation(id), factory.create(arguments));
+            final Stream oldStream = streams.putIfAbsent(id, stream);
+
+            if (oldStream != null) {
                 // Repeated calls to onListen may happen during hot restart.
                 // We separate them with a call to onCancel.
                 try {
-                    handler.onCancel(null);
+                    oldStream.handler.onCancel(null);
                 } catch (RuntimeException e) {
                     logError(id, "Failed to close existing event stream", e);
                 }
             }
+
             try {
-                handler.onListen(arguments, eventSink);
+                stream.handler.onListen(arguments, stream.sink);
                 callback.reply(codec.encodeSuccessEnvelope(null));
             } catch (RuntimeException e) {
-                activeSinks.remove(id);
+                streams.remove(id);
                 logError(id, "Failed to open event stream", e);
                 callback.reply(codec.encodeErrorEnvelope("error", e.getMessage(), null));
             }
         }
 
         private void onCancel(int id, Object arguments, BinaryReply callback) {
-            final EventChannel.EventSink oldSink = activeSinks.remove(id);
-            if (oldSink != null) {
+            final Stream oldStream = streams.remove(id);
+
+            if (oldStream != null) {
                 try {
-                    handler.onCancel(arguments);
+                    oldStream.handler.onCancel(arguments);
                     callback.reply(codec.encodeSuccessEnvelope(null));
                 } catch (RuntimeException e) {
                     logError(id, "Failed to close event stream", e);
@@ -129,7 +137,7 @@ public final class StreamsChannel {
 
             @Override
             public void success(Object event) {
-                if (hasEnded.get() || activeSinks.get(id) != this) {
+                if (hasEnded.get() || streams.get(id).sink != this) {
                     return;
                 }
                 StreamsChannel.this.messenger.send(name, codec.encodeSuccessEnvelope(event));
@@ -137,7 +145,7 @@ public final class StreamsChannel {
 
             @Override
             public void error(String errorCode, String errorMessage, Object errorDetails) {
-                if (hasEnded.get() || activeSinks.get(id) != this) {
+                if (hasEnded.get() || streams.get(id).sink != this) {
                     return;
                 }
                 StreamsChannel.this.messenger.send(
@@ -147,11 +155,21 @@ public final class StreamsChannel {
 
             @Override
             public void endOfStream() {
-                if (hasEnded.getAndSet(true) || activeSinks.get(id) != this) {
+                if (hasEnded.getAndSet(true) || streams.get(id).sink != this) {
                     return;
                 }
                 StreamsChannel.this.messenger.send(name, null);
             }
+        }
+    }
+
+    private static class Stream {
+        final EventChannel.EventSink sink;
+        final EventChannel.StreamHandler handler;
+
+        private Stream(EventChannel.EventSink sink, EventChannel.StreamHandler handler) {
+            this.sink = sink;
+            this.handler = handler;
         }
     }
 }
