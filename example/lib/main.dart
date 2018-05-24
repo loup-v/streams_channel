@@ -1,3 +1,6 @@
+//  Copyright (c) 2018 Loup Inc.
+//  Licensed under Apache License v2.0
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -28,8 +31,7 @@ class _MyAppState extends State<MyApp> {
       final streamId = 'Stream ${a ? 'A' : 'B'}';
       subscription = testChannel
           .receiveBroadcastStream(streamId)
-          .listen(
-              (data) => debugPrint('Received from $streamId: $data'));
+          .listen((data) => debugPrint('Received from $streamId: $data'));
     }
 
     setState(() {

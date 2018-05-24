@@ -12,8 +12,5 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  streams_channel:
-    path: ../
-
 flutter:
   uses-material-design: true
