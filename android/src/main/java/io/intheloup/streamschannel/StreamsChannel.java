@@ -28,9 +28,6 @@ public final class StreamsChannel {
 
     private static final String TAG = "StreamsChannel#";
 
-    private static final Pattern LISTEN_PATTERN = Pattern.compile("listen<(\\d*)>");
-    private static final Pattern CANCEL_PATTERN = Pattern.compile("cancel<(\\d*)>");
-
     private final BinaryMessenger messenger;
     private final String name;
     private final MethodCodec codec;
@@ -63,20 +60,33 @@ public final class StreamsChannel {
         @Override
         public void onMessage(ByteBuffer message, final BinaryReply reply) {
             final MethodCall call = codec.decodeMethodCall(message);
+            final String[] methodParts = call.method.split("#");
 
-            Matcher matcher = LISTEN_PATTERN.matcher(call.method);
-            if (matcher.matches()) {
-                onListen(Integer.parseInt(matcher.group(1)), call.arguments, reply);
+            if (methodParts.length != 2) {
+                reply.reply(null);
                 return;
             }
 
-            matcher = CANCEL_PATTERN.matcher(call.method);
-            if (matcher.matches()) {
-                onCancel(Integer.parseInt(matcher.group(1)), call.arguments, reply);
+            final int id;
+            try {
+                id = Integer.parseInt(methodParts[1]);
+            } catch (NumberFormatException e) {
+                reply.reply(codec.encodeErrorEnvelope("error", e.getMessage(), null));
                 return;
             }
 
-            reply.reply(null);
+            final String method = methodParts[0];
+            switch (method) {
+                case "listen":
+                    onListen(id, call.arguments, reply);
+                    break;
+                case "cancel":
+                    onCancel(id, call.arguments, reply);
+                    break;
+                default:
+                    reply.reply(null);
+                    break;
+            }
         }
 
         private void onListen(int id, Object arguments, BinaryReply callback) {
@@ -132,7 +142,7 @@ public final class StreamsChannel {
             @SuppressLint("DefaultLocale")
             private EventSinkImplementation(int id) {
                 this.id = id;
-                this.name = String.format("%s<%d>", StreamsChannel.this.name, id);
+                this.name = String.format("%s#%d", StreamsChannel.this.name, id);
             }
 
             @Override
