@@ -15,8 +15,29 @@ Add streams_channel to your pubspec.yaml:
 
 ```yaml
 dependencies:
-  streams_channel: ^0.2.1
+  streams_channel: ^0.2.2
 ```
+
+## How it works
+
+StreamsChannel works in a similar way than EventChannel. The difference is that it supports multiple open streams at the same time.
+
+On the platform side, the channel takes a stream handler factory:
+
+```swift
+let channel = FlutterStreamsChannel(name: "my_channel", binaryMessenger: plugin.registrar.messenger())
+channel.setStreamHandlerFactory { arguments in
+  return MyHandler(arguments) // MyHandler is an instance FlutterStreamHandler
+}
+```
+
+On the flutter side, each call to `receiveBroadcastStream(args)` will create a new stream, that won't replace any previous one that is still running.
+
+1. The first subscription to the stream will create a new stream handler using the factory on the platform side, then trigger `onListen` on the handler;
+2. The last subscription to the stream will trigger `onCancel` on the handler, then destroy the handler instance
+3. If a new first subscription happens afterwards, repeat step 1.
+
+Under the hood, StreamsChannel tracks each stream with a simple auto-incremented unique id.
 
 ## Example
 
@@ -37,10 +58,6 @@ channel.receiveBroadcastStream('some other args')
     // do something
   });
 ```
-
-Both streams are independent.  
-On each stream, first subscription will trigger `onListen` on platform side, and last subscription cancelling will trigger `onCancel`.
-
 
 ### Platform side
 

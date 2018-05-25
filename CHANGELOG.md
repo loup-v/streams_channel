@@ -1,3 +1,7 @@
+## 0.2.2
+
+* Internal improvements
+
 ## 0.2.1
 
 * Fix: Cocoapods podspec for iOS side
