@@ -1,16 +1,13 @@
-#
-# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html
-#
 Pod::Spec.new do |s|
   s.name             = 'streams_channel'
-  s.version          = '0.0.1'
+  s.version          = '0.2.1'
   s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
-A new flutter plugin project.
+StreamsChannel is inspired from EventChannel. It allows to create streams of events between Flutter and platform side.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/loup-v/streams_channel'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Loup Inc.' => 'hello@intheloup.io' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
