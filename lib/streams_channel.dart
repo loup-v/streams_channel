@@ -43,7 +43,7 @@ class StreamsChannel {
           exception: exception,
           stack: stack,
           library: 'streams_channel',
-          context: 'while activating platform stream on channel $name',
+          context: DiagnosticsNode.message('while activating platform stream on channel $name'),
         ));
       }
     }, onCancel: () async {
@@ -55,7 +55,7 @@ class StreamsChannel {
           exception: exception,
           stack: stack,
           library: 'streams_channel',
-          context: 'while de-activating platform stream on channel $name',
+          context:  DiagnosticsNode.message('while de-activating platform stream on channel $name'),
         ));
       }
     });
