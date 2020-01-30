@@ -1,5 +1,6 @@
 name: streams_channel_example
 description: Demonstrates how to use the streams_channel plugin.
+version: 1.0.0+1
 
 dependencies:
   flutter:

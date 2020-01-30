@@ -1,22 +1,22 @@
 PODS:
   - Flutter (1.0.0)
-  - streams_channel (0.0.1):
+  - streams_channel (0.2.1):
     - Flutter
 
 DEPENDENCIES:
-  - Flutter (from `.symlinks/flutter/ios`)
+  - Flutter (from `Flutter`)
   - streams_channel (from `.symlinks/plugins/streams_channel/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
-    :path: ".symlinks/flutter/ios"
+    :path: Flutter
   streams_channel:
     :path: ".symlinks/plugins/streams_channel/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
-  streams_channel: 779c7478161847d43867fa6d377ade8076ff3ef8
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  streams_channel: 733858967fb8b62e0d63a1d03f6b8f0cb7d3bfc2
 
-PODFILE CHECKSUM: 1e5af4103afd21ca5ead147d7b81d06f494f51a2
+PODFILE CHECKSUM: 3dbe063e9c90a5d7c9e4e76e70a821b9e2c1d271
 
-COCOAPODS: 1.5.2
+COCOAPODS: 1.8.4
