@@ -15,7 +15,7 @@ Add streams_channel to your pubspec.yaml:
 
 ```yaml
 dependencies:
-  streams_channel: ^0.2.2
+  streams_channel: ^0.2.3
 ```
 
 ## How it works
@@ -154,12 +154,10 @@ public class DemoPlugin {
 @end
 ```
 
-
 ## Author
 
 Beacons plugin is developed by Loup, a mobile development studio based in Montreal and Paris.  
 You can contact us at <hello@intheloup.io>
-
 
 ## License
 
