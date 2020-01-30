@@ -25,7 +25,8 @@ class StreamsChannel {
 
     StreamController<dynamic> controller;
     controller = new StreamController<dynamic>.broadcast(onListen: () async {
-      BinaryMessages.setMessageHandler(handlerName, (ByteData reply) async {
+      ServicesBinding.instance.defaultBinaryMessenger
+          .setMessageHandler(handlerName, (ByteData reply) async {
         if (reply == null) {
           controller.close();
         } else {
@@ -35,6 +36,8 @@ class StreamsChannel {
             controller.addError(e);
           }
         }
+
+        return reply;
       });
       try {
         await methodChannel.invokeMethod('listen#$id', arguments);
@@ -43,11 +46,13 @@ class StreamsChannel {
           exception: exception,
           stack: stack,
           library: 'streams_channel',
-          context: DiagnosticsNode.message('while activating platform stream on channel $name'),
+          context: DiagnosticsNode.message(
+              'while activating platform stream on channel $name'),
         ));
       }
     }, onCancel: () async {
-      BinaryMessages.setMessageHandler(handlerName, null);
+      ServicesBinding.instance.defaultBinaryMessenger
+          .setMessageHandler(handlerName, null);
       try {
         await methodChannel.invokeMethod('cancel#$id', arguments);
       } catch (exception, stack) {
@@ -55,7 +60,8 @@ class StreamsChannel {
           exception: exception,
           stack: stack,
           library: 'streams_channel',
-          context:  DiagnosticsNode.message('while de-activating platform stream on channel $name'),
+          context: DiagnosticsNode.message(
+              'while de-activating platform stream on channel $name'),
         ));
       }
     });
