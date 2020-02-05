@@ -7,18 +7,18 @@
 
 @interface FlutterStreamsChannel : NSObject
 
-+ (nonnull instancetype)streamsChannelWithName:(NSString*)name
-                     binaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger;
++ (nonnull instancetype)streamsChannelWithName:(NSString* _Nonnull)name
+                     binaryMessenger:(NSObject<FlutterBinaryMessenger>* _Nonnull)messenger;
 
-+ (nonnull instancetype)streamsChannelWithName:(NSString*)name
-                     binaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger
-                               codec:(NSObject<FlutterMethodCodec>*)codec;
++ (nonnull instancetype)streamsChannelWithName:(NSString* _Nonnull)name
+                     binaryMessenger:(NSObject<FlutterBinaryMessenger>* _Nonnull)messenger
+                               codec:(NSObject<FlutterMethodCodec>* _Nonnull)codec;
 
-- (nonnull instancetype)initWithName:(NSString*)name
-             binaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger
-                       codec:(NSObject<FlutterMethodCodec>*)codec;
+- (nonnull instancetype)initWithName:(NSString* _Nonnull)name
+             binaryMessenger:(NSObject<FlutterBinaryMessenger>* _Nonnull)messenger
+                       codec:(NSObject<FlutterMethodCodec>* _Nonnull)codec;
 
-- (void)setStreamHandlerFactory:(NSObject<FlutterStreamHandler>* (^)(id))factory;
+- (void)setStreamHandlerFactory:(NSObject<FlutterStreamHandler>* _Nullable (^ _Nonnull)(id _Nonnull))factory;
 
 @end
 

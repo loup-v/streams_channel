@@ -12,26 +12,27 @@
 
 @end
 
+// Inspired from: https://github.com/flutter/engine/blob/master/shell/platform/darwin/common/framework/Source/FlutterChannels.mm
 @implementation FlutterStreamsChannel {
   NSObject<FlutterBinaryMessenger>* _messenger;
   NSString* _name;
   NSObject<FlutterMethodCodec>* _codec;
 }
-+ (instancetype)streamsChannelWithName:(NSString*)name
-                     binaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger {
++ (instancetype)streamsChannelWithName:(NSString* _Nonnull)name
+                     binaryMessenger:(NSObject<FlutterBinaryMessenger>* _Nonnull)messenger {
   NSObject<FlutterMethodCodec>* codec = [FlutterStandardMethodCodec sharedInstance];
   return [FlutterStreamsChannel streamsChannelWithName:name binaryMessenger:messenger codec:codec];
 }
 
-+ (instancetype)streamsChannelWithName:(NSString*)name
-                     binaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger
-                               codec:(NSObject<FlutterMethodCodec>*)codec {
++ (instancetype)streamsChannelWithName:(NSString* _Nonnull)name
+                     binaryMessenger:(NSObject<FlutterBinaryMessenger>* _Nonnull)messenger
+                               codec:(NSObject<FlutterMethodCodec>* _Nonnull)codec {
   return [[FlutterStreamsChannel alloc] initWithName:name binaryMessenger:messenger codec:codec];
 }
 
-- (instancetype)initWithName:(NSString*)name
-             binaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger
-                       codec:(NSObject<FlutterMethodCodec>*)codec {
+- (instancetype)initWithName:(NSString* _Nonnull)name
+             binaryMessenger:(NSObject<FlutterBinaryMessenger>* _Nonnull)messenger
+                       codec:(NSObject<FlutterMethodCodec>* _Nonnull)codec {
   self = [super init];
   NSAssert(self, @"Super init cannot be nil");
   _name = name;
