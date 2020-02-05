@@ -1,3 +1,8 @@
+## 0.3.0
+
+- Upgrade project structure to flutter v1.12
+- Fix compilation warnings
+
 ## 0.2.3
 
 - Remove deprecated use of platform API
