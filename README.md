@@ -1,5 +1,7 @@
 # StreamsChannel for Flutter plugin development
 
+[![pub package](https://img.shields.io/pub/v/streams_channel.svg)](https://pub.dartlang.org/packages/streams_channel)
+
 StreamsChannel is inspired from EventChannel. It allows to create streams of events between Flutter and platform side.
 
 ## Rationale
@@ -11,12 +13,7 @@ In order to have multiple streams open at the same time, with different paramete
 
 ## Installation
 
-Add streams_channel to your pubspec.yaml:
-
-```yaml
-dependencies:
-  streams_channel: ^0.2.3
-```
+Follow the instructions: https://pub.dev/packages/streams_channel#-installing-tab-
 
 ## How it works
 
@@ -157,7 +154,7 @@ public class DemoPlugin {
 ## Author
 
 Beacons plugin is developed by Loup, a mobile development studio based in Montreal and Paris.  
-You can contact us at <hello@intheloup.io>
+You can contact us at <hello@loup.app>
 
 ## License
 
