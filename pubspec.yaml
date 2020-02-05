@@ -4,7 +4,7 @@ version: 0.2.3
 homepage: https://github.com/loup-v/streams_channel
 
 environment:
-  sdk: ">=1.19.0 <3.0.0"
+  sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -12,5 +12,9 @@ dependencies:
 
 flutter:
   plugin:
-    androidPackage: io.intheloup.streamschannel
-    pluginClass: StreamsChannelPlugin
+    platforms:
+      android:
+        package: app.loup.streams_channel
+        pluginClass: StreamsChannelPlugin
+      ios:
+        pluginClass: StreamsChannelPlugin
