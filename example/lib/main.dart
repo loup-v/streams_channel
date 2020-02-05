@@ -6,9 +6,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:streams_channel/streams_channel.dart';
 
-final StreamsChannel testChannel = new StreamsChannel('streams_channel_test');
-
 void main() => runApp(new MyApp());
+
+final StreamsChannel streamsChannel = StreamsChannel('streams_channel_example');
 
 class MyApp extends StatefulWidget {
   @override
@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
       subscription = null;
     } else {
       final streamId = 'Stream ${a ? 'A' : 'B'}';
-      subscription = testChannel
+      subscription = streamsChannel
           .receiveBroadcastStream(streamId)
           .listen((data) => debugPrint('Received from $streamId: $data'));
 

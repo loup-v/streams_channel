@@ -1,7 +1,12 @@
-//  Copyright (c) 2018 Loup Inc.
-//  Licensed under Apache License v2.0
+//
+//  PluginExample.m
+//  Runner
+//
+//  Created by Lukasz on 2020-02-05.
+//  Copyright © 2020 The Chromium Authors. All rights reserved.
+//
 
-#import "DemoPlugin.h"
+#import "PluginExample.h"
 #import <streams_channel/FlutterStreamsChannel.h>
 
 @interface StreamHandler : NSObject<FlutterStreamHandler>
@@ -9,11 +14,11 @@
   @property(assign, nonatomic) NSInteger count;
 @end
 
-@implementation DemoPlugin
+@implementation PluginExample
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
   
-  FlutterStreamsChannel *channel = [FlutterStreamsChannel streamsChannelWithName:@"streams_channel_test" binaryMessenger:registrar.messenger];
+  FlutterStreamsChannel *channel = [FlutterStreamsChannel streamsChannelWithName:@"streams_channel_example" binaryMessenger:registrar.messenger];
   [channel setStreamHandlerFactory:^NSObject<FlutterStreamHandler> *(id arguments) {
     return [StreamHandler new];
   }];

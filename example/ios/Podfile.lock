@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - streams_channel (0.2.1):
+  - streams_channel (0.0.1):
     - Flutter
 
 DEPENDENCIES:
@@ -15,8 +15,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  streams_channel: 733858967fb8b62e0d63a1d03f6b8f0cb7d3bfc2
+  streams_channel: 16855ffd0568eded9563b2fec6a1bfa94420b353
 
-PODFILE CHECKSUM: 3dbe063e9c90a5d7c9e4e76e70a821b9e2c1d271
+PODFILE CHECKSUM: 59f923a7c5d63904f078501340d66bc5ec8ed887
 
 COCOAPODS: 1.8.4
