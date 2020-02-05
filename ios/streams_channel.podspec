@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'streams_channel'
-  s.version          = '0.2.1'
+  s.version          = '0.0.1'
   s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
 StreamsChannel is inspired from EventChannel. It allows to create streams of events between Flutter and platform side.
